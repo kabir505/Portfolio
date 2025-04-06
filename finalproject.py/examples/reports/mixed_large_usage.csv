@@ -1,0 +1,18 @@
+type,line,structure_type,details,usage_context,impact_estimate
+detection,3,List,List comprehension (implicit list construction).,,
+detection,4,Membership Test on data,Membership test detected (consider using set).,membership_test,
+detection,7,Dictionary,"Key-value pairs, mutable, ordered since Python 3.7+.",,
+detection,9,Dictionary,Manual counter pattern (dict.get + 1).,manual_counter,
+detection,11,List,"Ordered, mutable, allows duplicates.",,
+detection,13,List,append usage detected (may indicate inefficient queue use).,append_or_pop,
+detection,16,List,pop usage detected (may indicate inefficient queue use).,append_or_pop,
+detection,19,Set,"Unordered, mutable, no duplicates.",,
+detection,20,Membership Test on my_set,Membership test detected (efficient — using set).,membership_test,
+detection,23,Counter,Counts elements (collections.Counter).,,
+detection,26,Deque,Fast queue operations (collections.deque).,,
+detection,27,Deque,append usage detected (efficient — using deque).,append_or_pop,
+detection,28,Deque,popleft usage detected (efficient — using deque).,append_or_pop,
+suggestion,4,Membership Test on data,Use a set for membership testing.,membership_test,"Can reduce lookup time and CPU cycles significantly, improving sustainability."
+suggestion,9,Dictionary,Use collections.Counter instead of manual dictionary counting.,manual_counter,Reduces repeated memory operations and redundant instructions.
+suggestion,13,List,Consider using collections.deque for queue operations.,append_or_pop,"Reduces unnecessary re-indexing in lists, saving computational effort."
+suggestion,16,List,Consider using collections.deque for queue operations.,append_or_pop,"Reduces unnecessary re-indexing in lists, saving computational effort."
