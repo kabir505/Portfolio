@@ -1,0 +1,4 @@
+line,structure_type,details,usage_context
+4,Set,"Unordered, mutable, no duplicates.",
+9,Counter,Counts elements (collections.Counter).,
+13,Deque,Fast queue operations (collections.deque).,

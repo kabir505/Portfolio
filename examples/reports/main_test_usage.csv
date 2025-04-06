@@ -1,0 +1,12 @@
+line,structure_type,details,usage_context,impact_estimate
+1,List,"Ordered, mutable, allows duplicates.",,
+4,Membership Test on numbers,Membership test detected (consider using set).,membership_test,
+8,Dictionary,"Key-value pairs, mutable, ordered since Python 3.7+.",,
+9,Dictionary,Manual counter pattern (dict.get + 1).,manual_counter,
+12,List,"Ordered, mutable, allows duplicates.",,
+13,List,append usage detected (may indicate inefficient queue use).,append_or_pop,
+14,List,pop usage detected (may indicate inefficient queue use).,append_or_pop,
+4,Membership Test on numbers,Use a set for membership testing.,membership_test,"Can reduce lookup time and CPU cycles significantly, improving sustainability."
+9,Dictionary,Use collections.Counter instead of manual dictionary counting.,manual_counter,Reduces repeated memory operations and redundant instructions.
+13,List,Consider using collections.deque for queue operations.,append_or_pop,"Reduces unnecessary re-indexing in lists, saving computational effort."
+14,List,Consider using collections.deque for queue operations.,append_or_pop,"Reduces unnecessary re-indexing in lists, saving computational effort."
