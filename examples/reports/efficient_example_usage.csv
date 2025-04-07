@@ -1,4 +1,7 @@
-line,structure_type,details,usage_context
-4,Set,"Unordered, mutable, no duplicates.",
-9,Counter,Counts elements (collections.Counter).,
-13,Deque,Fast queue operations (collections.deque).,
+type,line,structure_type,details,usage_context,impact_estimate
+detection,4,Set,"Unordered, mutable, no duplicates.",,
+detection,5,Membership Test on ids,Membership test detected (efficient — using set).,membership_test,
+detection,9,Counter,Counts elements (collections.Counter).,,
+detection,13,Deque,Fast queue operations (collections.deque).,,
+detection,14,Deque,append usage detected (efficient — using deque).,append_or_pop,
+detection,15,Deque,popleft usage detected (efficient — using deque).,append_or_pop,

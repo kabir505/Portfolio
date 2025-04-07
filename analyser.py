@@ -14,6 +14,8 @@ class DataStructureAnalyzer(ast.NodeVisitor):
 
         # Track variable names assigned to set literals (for smarter membership detection)
         self.known_sets = set()
+        
+        self.known_deques = set()
 
     def record_structure(self, node, struct_type, details="", usage_context=None):
         """
@@ -43,6 +45,15 @@ class DataStructureAnalyzer(ast.NodeVisitor):
     def visit_Dict(self, node):
         self.record_structure(node, "Dictionary", "Key-value pairs, mutable, ordered since Python 3.7+.")
         self.generic_visit(node)
+        
+    def visit_ListComp(self, node):
+        self.record_structure(
+            node,
+            "List",
+            "List comprehension (implicit list construction)."
+        )
+        self.generic_visit(node)
+
 
     # === SPECIAL STRUCTURES & MODULES ===
 
@@ -98,15 +109,25 @@ class DataStructureAnalyzer(ast.NodeVisitor):
 
     def visit_Assign(self, node):
         """
-        - Tracks variables assigned to set literals (for smarter membership detection).
-        - Detects manual dictionary counters (dict.get(..., 0) + 1).
+        Tracks:
+        - set assignments for efficient membership tests
+        - deque assignments to avoid false suggestions
+        - manual counter patterns using dict.get(...)
         """
 
-        # Track variables assigned to set literals
+        # Track set assignments
         if isinstance(node.value, ast.Set):
             for target in node.targets:
                 if isinstance(target, ast.Name):
                     self.known_sets.add(target.id)
+
+        # Track deque assignments
+        if isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name):
+            if node.value.func.id == "deque":
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        self.known_deques.add(target.id)
+
 
         # Detect manual counter pattern
         if isinstance(node.value, ast.BinOp) and isinstance(node.value.op, ast.Add):
@@ -122,60 +143,76 @@ class DataStructureAnalyzer(ast.NodeVisitor):
 
         self.generic_visit(node)
 
+
+
     # === CONTEXT-BASED DETECTION ===
 
     def visit_If(self, node):
         """
-        Detects inefficient membership tests: `if x in list`
-        Skips:
-        - set literals
-        - variables known to be sets
+        Detects all membership tests: `if x in y`
+        Records whether the test is efficient or inefficient.
         """
-
         if isinstance(node.test, ast.Compare) and isinstance(node.test.ops[0], ast.In):
             collection = node.test.comparators[0]
-
-            # Skip literal sets (e.g., if x in {1, 2, 3})
-            if isinstance(collection, ast.Set):
-                return
-
-            # Skip known variables assigned to sets earlier
-            if isinstance(collection, ast.Name) and collection.id in self.known_sets:
-                return
-
-            # Default to naming the collection
             collection_name = collection.id if isinstance(collection, ast.Name) else "Collection"
+
+            # Determine if this is efficient usage (set literal or known set variable)
+            is_efficient = (
+                isinstance(collection, ast.Set) or
+                (isinstance(collection, ast.Name) and collection.id in self.known_sets)
+            )
+
+            # Generate description string with keyword 'efficient' if applicable
+            note = (
+                "Membership test detected (efficient — using set)." if is_efficient
+                else "Membership test detected (consider using set)."
+            )
 
             self.record_structure(
                 node,
                 f"Membership Test on {collection_name}",
-                "Membership test detected (consider using set).",
+                note,
                 usage_context="membership_test"
             )
 
         self.generic_visit(node)
 
+
+
     def visit_Attribute(self, node):
         """
-        Detects queue-like patterns using lists:
-        - .append()
-        - .pop()
-        Skips if the variable name suggests it's a deque or queue (e.g., 'q', 'deque', 'queue').
+        Detects all queue-related usage patterns:
+        - .append(), .pop(), .popleft(), .appendleft()
+        Records them all, but only marks them efficient if using deque().
         """
-        if node.attr in {"append", "pop"}:
+
+        if node.attr in {"append", "pop", "popleft", "appendleft"}:
+            var_name = None
             if isinstance(node.value, ast.Name):
-                var_name = node.value.id.lower()
-                if var_name in {"deque", "queue", "dq"}:
-                    return  # Skip likely deque usage
+                var_name = node.value.id
+
+            
+            is_efficient = var_name in self.known_deques if var_name else False
+
+            note = (
+                f"{node.attr} usage detected (efficient — using deque)." if is_efficient
+                else f"{node.attr} usage detected (may indicate inefficient queue use)."
+            )
 
             self.record_structure(
                 node,
-                "List",
-                f"{node.attr} usage detected (may indicate inefficient queue use).",
+                "Deque" if is_efficient else "List",
+                note,
                 usage_context="append_or_pop"
             )
 
         self.generic_visit(node)
+
+
+
+
+
+
 
     # === CLASS-BASED STRUCTURE DETECTION ===
 

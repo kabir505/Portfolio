@@ -10,6 +10,6 @@ words = Counter()
 words.update("banana")
 
 # Use deque as queue
-queue = deque()
-queue.append("x")
-queue.popleft()
+q = deque()
+q.append("x")
+q.popleft()

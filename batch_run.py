@@ -22,7 +22,7 @@ def run_batch(refresh_expected=False):
 
     submission_files = [f for f in os.listdir(USER_SUBMISSIONS_DIR) if f.endswith(".py")]
     if not submission_files:
-        print("⚠️ No Python files found in user_submissions/")
+        print("No Python files found in user_submissions/")
         return
 
     summary = []
@@ -45,7 +45,7 @@ def run_batch(refresh_expected=False):
             "--score"
         ], capture_output=True, text=True)
 
-        print(f"📄 {file}:")
+        print(f"{file}:")
         print(f"{result.stdout.strip()}\n")
 
         # Optional: update expected report
@@ -60,10 +60,10 @@ def run_batch(refresh_expected=False):
         # Compare reports
         match = compare_reports(report_path, expected_path)
         if match:
-            print(f"✅ Test PASSED for {file}")
+            print(f"Test PASSED for {file}")
             summary.append((file, "PASSED"))
         else:
-            print(f"❌ Test FAILED for {file}")
+            print(f"Test FAILED for {file}")
             summary.append((file, "FAILED"))
 
         print("-" * 50)
@@ -72,7 +72,7 @@ def run_batch(refresh_expected=False):
     print("\n📋 Batch Test Summary:")
     for name, status in summary:
         print(f"• {name}: {status}")
-    print("\n✅ All done.")
+    print("\n All done.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run batch analysis and optionally refresh expected reports.")

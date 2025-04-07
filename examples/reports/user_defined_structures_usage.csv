@@ -1,0 +1,7 @@
+type,line,structure_type,details,usage_context,impact_estimate
+detection,1,User-Defined Stack,LIFO structure.,,
+detection,3,List,"Ordered, mutable, allows duplicates.",,
+detection,5,User-Defined Linked List,Custom linked list.,,
+detection,9,User-Defined Graph,Custom graph structure.,,
+detection,11,Dictionary,"Key-value pairs, mutable, ordered since Python 3.7+.",,
+detection,13,User-Defined Tree,Custom tree structure.,,

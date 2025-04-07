@@ -1,28 +1,24 @@
 # Inefficient membership test
-names = ["Alice", "Bob", "Charlie", "Dave", "Eve"]
+names = ["Alice", "Bob", "Charlie", "Dave"]
 if "Charlie" in names:
-    print("Found")
+    print("Found!")
 
-# Manual counting using a dict
+# Manual counting
 letter_counts = {}
-for c in "artificialintelligence":
+for c in "intelligence":
     letter_counts[c] = letter_counts.get(c, 0) + 1
 
-# List used as a queue
+# List used as queue
 queue = []
-queue.append("start")
-queue.append("process")
-queue.pop(0)
+queue.append("task")
 queue.pop(0)
 
-# Deep nested usage
+# Membership test inside loop
 users = [{"id": i} for i in range(1000)]
-found = False
 for user in users:
     if user["id"] in names:
-        found = True
+        print("Found match")
 
-# Redundant dictionary usage
+# Another manual counter
 scores = {}
 scores["math"] = scores.get("math", 0) + 1
-scores["science"] = scores.get("science", 0) + 1

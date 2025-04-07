@@ -30,9 +30,19 @@ class ReportGenerator:
                     report_lines.append(f"- **Usage context:** {suggestion['usage_context']}")
                 report_lines.append(f"- **Suggestion:** {suggestion['suggestion']}")
                 report_lines.append(f"- **Explanation:** {suggestion['explanation']}")
-                report_lines.append(f"- **Impact:** {suggestion['impact_estimate']}\n")
+                report_lines.append(f"- **Impact:** {suggestion['impact_estimate']}")
 
-        with open(file_name, "w") as f:
+                # ✅ Include code fix snippet if available
+                fix_snippet = suggestion.get("fix_snippet")
+                if fix_snippet:
+                    report_lines.append("")  # spacing
+                    report_lines.append("```python")
+                    report_lines.append(fix_snippet.strip())
+                    report_lines.append("```")
+
+                report_lines.append("")  # spacing between suggestions
+
+        with open(file_name, "w", encoding="utf-8") as f:
             f.write("\n".join(report_lines))
 
         return file_name

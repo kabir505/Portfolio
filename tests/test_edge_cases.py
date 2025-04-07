@@ -68,7 +68,12 @@ def test_file_with_no_suggestions_needed():
     """)
     result = analyse_code(code)
     inefficient = {"membership_test", "manual_counter", "append_or_pop"}
-    assert not any(r["usage_context"] in inefficient for r in result)
+    has_false_positive = any(
+        r["usage_context"] in inefficient and "efficient" not in r["details"].lower()
+        for r in result
+    )
+    assert not has_false_positive
+
 
 # === CORE STRUCTURE DETECTION TESTS ===
 

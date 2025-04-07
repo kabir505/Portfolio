@@ -7,12 +7,6 @@ class SuggestionRule:
     """
 
     def __init__(self, condition_function, suggestion, explanation, impact_estimate):
-        """
-        :param condition_function: A function that takes a structure dict and returns True if the rule applies.
-        :param suggestion: Suggested alternative data structure.
-        :param explanation: Explanation of why the alternative is better.
-        :param impact_estimate: Estimated improvement impact (textual description).
-        """
         self.condition_function = condition_function
         self.suggestion = suggestion
         self.explanation = explanation
@@ -30,28 +24,27 @@ class SuggestionRule:
             }
         return None
 
+
 # === RULE CONDITIONS ===
 
 def is_membership_test_on_list(structure):
-    """
-    Matches structures that represent inefficient membership tests on a list.
-    """
     return (
         structure.get("usage_context") == "membership_test" and
-        structure.get("type", "").lower().startswith("membership test")
+        structure.get("type", "").lower().startswith("membership test") and
+        "efficient" not in structure.get("details", "").lower()
     )
 
+
 def is_manual_counter_detected(structure):
-    """
-    Matches dictionaries that are being used as manual counters.
-    """
     return structure.get("usage_context") == "manual_counter"
 
+
 def is_queue_like_list_usage(structure):
-    """
-    Matches list usage patterns that simulate a queue (e.g. append + pop(0)).
-    """
-    return structure.get("usage_context") == "append_or_pop"
+    return (
+        structure.get("usage_context") == "append_or_pop" and
+        "efficient — using deque" not in structure.get("details", "").lower()
+    )
+
 
 # === RULE DEFINITIONS ===
 

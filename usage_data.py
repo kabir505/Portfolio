@@ -14,21 +14,27 @@ class UsageDataCollector:
     def add_detected_structure(self, structure):
         """Adds a detected structure to the records."""
         self.records.append({
+            "type": "detection",
             "line": structure.get("line"),
             "structure_type": structure.get("type"),
             "details": structure.get("details"),
-            "usage_context": structure.get("usage_context")
+            "usage_context": structure.get("usage_context"),
+            "impact_estimate": ""  # Detections don't have impact estimates
         })
 
     def add_suggestion(self, suggestion):
         """Adds a suggestion entry to the records."""
         self.records.append({
+            "type": "suggestion",
             "line": suggestion.get("line"),
             "structure_type": suggestion.get("current_type"),
             "details": suggestion.get("suggestion"),
             "usage_context": suggestion.get("usage_context"),
-            "impact_estimate": suggestion.get("impact_estimate")
+            "impact_estimate": suggestion.get("impact_estimate"),
+            "fix_snippet": suggestion.get("fix_snippet", "").strip()
         })
+        
+
 
     def export_csv(self, file_name="usage_data.csv"):
         """Exports the collected data to a CSV file."""

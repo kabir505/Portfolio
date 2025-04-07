@@ -20,6 +20,8 @@ def main():
     parser.add_argument("--score", action="store_true", help="Display sustainability score.")
     parser.add_argument("--export-csv", help="Export usage and suggestion data to CSV.")
     parser.add_argument("--verbose", action="store_true", help="Print suggestions in the console.")
+    parser.add_argument("--auto-fix", action="store_true", help="Auto-rewrite inefficient patterns with sustainable fixes.")
+
 
     args = parser.parse_args()
 
@@ -27,6 +29,21 @@ def main():
         code = file.read()
 
     detected_structures = analyse_code(code)
+    
+    from auto_fixer import apply_auto_fixes  # Make sure this is at the top of the file
+
+    if args.auto_fix:
+        fixed_code, changed = apply_auto_fixes(code)
+        if changed:
+            fixed_path = args.input.replace(".py", "_autofixed.py")
+            with open(fixed_path, "w", encoding="utf-8") as f:
+                f.write(fixed_code)
+            print(f"Auto-fixed file saved as: {fixed_path}")
+        else:
+            print("No auto-fixes were needed.")
+
+    
+    
     suggestor = Suggestor(detected_structures)
     suggestions = suggestor.get_suggestions()
 
@@ -38,7 +55,10 @@ def main():
         for suggestion in suggestions:
             print(f"Line {suggestion['line']}: {suggestion['suggestion']}")
             print(f"Explanation: {suggestion['explanation']}")
-            print(f"Impact: {suggestion['impact_estimate']}\n")
+            print(f"Impact: {suggestion['impact_estimate']}")
+            print("Fix Snippet:\n" + suggestion.get("fix_snippet", "").strip())
+            print()
+
 
     # Generate report if requested
     if args.report:

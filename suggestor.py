@@ -1,6 +1,7 @@
 # suggestor.py
 
 from rules import rules
+from snippet_generator import get_fix_snippet  # ✅ Add this import
 
 class Suggestor:
     """
@@ -15,9 +16,10 @@ class Suggestor:
         """Applies each suggestion rule to each detected structure."""
         for structure in self.detected_structures:
             for rule in rules:
-                suggestion = rule.apply(structure)
-                if suggestion:
-                    self.suggestions.append(suggestion)
+                result = rule.apply(structure)
+                if result:
+                    result["fix_snippet"] = get_fix_snippet(result) 
+                    self.suggestions.append(result)
 
     def get_suggestions(self):
         """Returns compiled suggestions after applying rules."""
