@@ -1,0 +1,22 @@
+type,line,structure_type,details,usage_context,impact_estimate,fix_snippet
+detection,1,List,"Ordered, mutable, allows duplicates.",,,
+detection,2,Membership Test on numbers,Membership test detected (consider using set).,membership_test,,
+detection,5,Dictionary,"Key-value pairs, mutable, ordered since Python 3.7+.",,,
+detection,6,Dictionary,Manual counter pattern (dict.get + 1).,manual_counter,,
+detection,8,List,"Ordered, mutable, allows duplicates.",,,
+detection,9,List,append usage detected (may indicate inefficient queue use).,append_or_pop,,
+detection,10,List,pop usage detected (may indicate inefficient queue use).,append_or_pop,,
+suggestion,2,Membership Test on numbers,Use a set for membership testing.,membership_test,"Can reduce lookup time and CPU cycles significantly, improving sustainability.","data = { ... }  # Use a set instead of a list
+if item in data:
+    print(""Found"")"
+suggestion,6,Dictionary,Use collections.Counter instead of manual dictionary counting.,manual_counter,Reduces repeated memory operations and redundant instructions.,"from collections import Counter
+counts = Counter()
+counts.update(your_data_here)"
+suggestion,9,List,Consider using collections.deque for queue operations.,append_or_pop,"Reduces unnecessary re-indexing in lists, saving computational effort.","from collections import deque
+queue = deque()
+queue.append(""item"")
+queue.popleft()"
+suggestion,10,List,Consider using collections.deque for queue operations.,append_or_pop,"Reduces unnecessary re-indexing in lists, saving computational effort.","from collections import deque
+queue = deque()
+queue.append(""item"")
+queue.popleft()"

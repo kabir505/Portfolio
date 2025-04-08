@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Structure Sustainability Tool</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    
+<div class="container">
+  <h1>🖥️ Data Structure Sustainability Tool</h1>
+
+  <div class="upload-box">
+    <form method="POST" enctype="multipart/form-data">
+      <input type="file" name="codefile"><br><br>
+      <button type="submit">Analyse File</button>
+    </form>
+  </div>
+
+  {% if filename %}
+    <h2>📂 Results for <code>{{ filename }}</code></h2>
+    <h3>Sustainability Score: {{ score }}/100</h3>
+
+    {% if code %}
+    <h3>📝 Uploaded Code:</h3>
+    <div id="code-area">{{ code | safe }}</div>
+    {% endif %}
+
+    {% if summary %}
+    <h3>🧠 Fix Summary:</h3>
+    <ul>
+      {% for k, v in summary.items() %}
+      <li><strong>{{ k.title() }}:</strong> {{ v }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if suggestions %}
+    <h3>💡 Suggestions:</h3>
+    {% for s in suggestions %}
+    <div class="suggestion-box">
+      <p><strong>Line {{ s.line }}:</strong> {{ s.suggestion }}</p>
+      <em>{{ s.explanation }}</em><br>
+      <strong>Impact:</strong> {{ s.impact_estimate }}
+      {% if s.fix_snippet %}
+      <pre><code class="language-python">{{ s.fix_snippet }}</code></pre>
+      <button class="see-code" data-line="{{ s.line }}">👁 See in Code</button>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <h3>📊 Score Chart:</h3>
+    <img src="{{ url_for('static', filename='sustainability_chart.png') }}" class="chart-img" alt="Score Chart">
+
+    <h3>🥜 Suggestion Distribution:</h3>
+    <img src="{{ url_for('static', filename='suggestion_types_pie.png') }}" class="chart-img" alt="Pie Chart">
+  {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
+
+
+
+ 

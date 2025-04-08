@@ -1,0 +1,33 @@
+type,line,structure_type,details,usage_context,impact_estimate,fix_snippet
+detection,2,List,"Ordered, mutable, allows duplicates.",,,
+detection,3,Membership Test on names,Membership test detected (consider using set).,membership_test,,
+detection,7,Dictionary,"Key-value pairs, mutable, ordered since Python 3.7+.",,,
+detection,9,Dictionary,Manual counter pattern (dict.get + 1).,manual_counter,,
+detection,12,List,"Ordered, mutable, allows duplicates.",,,
+detection,13,List,append usage detected (may indicate inefficient queue use).,append_or_pop,,
+detection,14,List,pop usage detected (may indicate inefficient queue use).,append_or_pop,,
+detection,17,List,List comprehension (implicit list construction).,,,
+detection,17,Dictionary,"Key-value pairs, mutable, ordered since Python 3.7+.",,,
+detection,19,Membership Test on names,Membership test detected (consider using set).,membership_test,,
+detection,23,Dictionary,"Key-value pairs, mutable, ordered since Python 3.7+.",,,
+detection,24,Dictionary,Manual counter pattern (dict.get + 1).,manual_counter,,
+suggestion,3,Membership Test on names,Use a set for membership testing.,membership_test,"Can reduce lookup time and CPU cycles significantly, improving sustainability.","data = { ... }  # Use a set instead of a list
+if item in data:
+    print(""Found"")"
+suggestion,9,Dictionary,Use collections.Counter instead of manual dictionary counting.,manual_counter,Reduces repeated memory operations and redundant instructions.,"from collections import Counter
+counts = Counter()
+counts.update(your_data_here)"
+suggestion,13,List,Consider using collections.deque for queue operations.,append_or_pop,"Reduces unnecessary re-indexing in lists, saving computational effort.","from collections import deque
+queue = deque()
+queue.append(""item"")
+queue.popleft()"
+suggestion,14,List,Consider using collections.deque for queue operations.,append_or_pop,"Reduces unnecessary re-indexing in lists, saving computational effort.","from collections import deque
+queue = deque()
+queue.append(""item"")
+queue.popleft()"
+suggestion,19,Membership Test on names,Use a set for membership testing.,membership_test,"Can reduce lookup time and CPU cycles significantly, improving sustainability.","data = { ... }  # Use a set instead of a list
+if item in data:
+    print(""Found"")"
+suggestion,24,Dictionary,Use collections.Counter instead of manual dictionary counting.,manual_counter,Reduces repeated memory operations and redundant instructions.,"from collections import Counter
+counts = Counter()
+counts.update(your_data_here)"

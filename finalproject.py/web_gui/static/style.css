@@ -1,0 +1,107 @@
+body {
+    background-color: #0f0f1a;
+    color: #e0e0e0;
+    font-family: 'Fira Code', monospace;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 960px;
+    margin: auto;
+}
+
+.upload-box {
+    border: 2px dashed #bb86fc;
+    padding: 30px;
+    margin-bottom: 30px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+button {
+    background-color: #bb86fc;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    background-color: #9859e6;
+    transform: scale(1.05);
+}
+
+pre code {
+    background: #1e1e3f;
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+    display: block;
+}
+
+.code-box {
+    margin: 20px 0;
+    background: #1e1e1e;
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
+.suggestion-box {
+    background-color: #1b1327;
+    border-left: 5px solid #bb86fc;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #00000040;
+}
+
+.chart-img {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+/* === Highlighted code table (Pygments) === */
+.highlighttable {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Fira Code', monospace;
+}
+
+.highlighttable td {
+    vertical-align: top;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+}
+
+.highlighttable pre {
+    margin: 0;
+    padding: 0 10px;
+    background-color: #1e1e3f;
+    line-height: 1.25;
+    font-size: 14px;
+}
+
+.highlighttable .linenos {
+    width: 50px;
+    background-color: #12111f;
+    color: #888;
+    text-align: right;
+    user-select: none;
+    padding-right: 10px;
+    font-size: 14px;
+    line-height: 1.25px;
+}
+
+/* Prevent gray box at bottom */
+.highlighttable tr:last-child td {
+    background-color: transparent;
+    height: 0;
+}
