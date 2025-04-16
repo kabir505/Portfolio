@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Data Structure Sustainability Tool</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- Fullscreen loading bar that appears during page load or heavy computation -->
+<div id="loading-bar"></div>
+<div id="loader-overlay">
+  <div class="loader-text">Loading...</div>
+  <div id="loader-progress-bar">
+    <div id="loader-progress-fill"></div>
+  </div>
+</div>
+
+<!-- Main content area that holds everything on the page -->
+<div class="container">
+
+  <!-- Header area including title and sticky header toggle -->
+  <div class="sticky-wrapper">
+    <h1>Data Structure Sustainability Tool</h1>
+
+    <!-- Optional sticky toggle checkbox -->
+    <label class="sticky-toggle">
+      <input type="checkbox" id="toggle-sticky" /> Sticky Header
+    </label>
+
+    <!-- File upload + theme selection -->
+    <div class="upload-box">
+      <form method="POST" enctype="multipart/form-data" onsubmit="return handleUploadSubmit()">
+        <input type="file" name="codefile" id="codefile" onchange="showFileName(this)">
+        <span id="file-name"></span><br /><br />
+
+        <label for="theme-selector">Theme:</label>
+        <select name="theme" id="theme-selector">
+          <option value="dracula">Dracula</option>
+          <option value="monokai">Monokai</option>
+        </select>
+
+        <!-- ✅ Store last submitted code for auto-fix download -->
+        <input type="hidden" id="submitted_code" name="submitted_code" value="{{ submitted_code }}">
+
+        <button type="submit">Analyse File</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Live editor for pasting and testing code directly -->
+  <h3>Live Editor:</h3>
+  <div id="editor"># Paste your Python code here</div>
+  <form id="editor-form" method="POST">
+    <input type="hidden" name="editor_code" id="editor_code">
+  </form>
+
+  <button id="run-editor-btn" onclick="return handleEditorSubmit()">Analyse Editor Code</button>
+
+  {% if filename %}
+    <h2>Results for <code>{{ filename }}</code></h2>
+    <h3>Sustainability Score: {{ score }}/100</h3>
+
+    {% if code %}
+      <h3>Uploaded Code:</h3>
+      <div id="code-area">{{ code | safe }}</div>
+    {% endif %}
+
+    {% if summary %}
+      <h3>Current Fixes needed::</h3>
+            
+      <ul>
+        {% for k, v in summary.items() %}
+          <li><strong>{{ k.title() }}:</strong> {{ v }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  
+    <h3>Fix Definitions::</h3>
+    <br>
+    <div style="margin-top: -1em; font-size: 0.95em; color: #ccc; text-align: left-align;">
+      <p style="margin-bottom: 1em;">
+        <strong>Testing</strong> – Improves membership checks by replacing inefficient "in list" with "in set"" for faster lookups.
+      </p>
+      <p style="margin-bottom: 1em;">
+        <strong>Counting</strong> – Suggests using "collections.Counter" instead of manually counting items in dictionaries.
+      </p>
+      <p style="margin-bottom: 1em;">
+        <strong>Operations</strong> – Replaces inefficient operations like "list.pop(0)" with better structures like "deque.popleft()".
+      </p>
+      <p style="margin-bottom: 1em;">
+        <strong>Comprehension</strong> – Recommends using dictionary comprehensions or "dict(zip(...))"" instead of manually building dicts in loops.
+      </p>
+      <p style="margin-bottom: 1em;">
+        <strong>Structure</strong> – Encourages replacing redundant or outdated data structures (like "OrderedDict") with modern equivalents (like "dict" in Python 3.7+).
+      </p>
+      <p style="margin-bottom: 1em;">
+        <strong>Other</strong> – Covers general structural improvements or patterns not categorised above.
+      </p>
+    </div>
+    
+
+
+    {% if structure_summary %}
+      <h3>Detected Data Structures:</h3>
+      <table class="structure-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Count</th>
+            <th>Lines Used</th>
+            <th>Efficient?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for k, v in structure_summary.items() %}
+          <tr>
+            <td>{{ k }}</td>
+            <td>{{ v.count }}</td>
+            <td>{{ v.lines | join(', ') }}</td>
+            <td>{{ "Yes" if not v.suggested else "No" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    <h3>Suggestions:</h3>
+    <div class="controls-row">
+      <input type="text" id="filter-input" placeholder="Filter suggestions..." title="Type to filter suggestions">
+      <div class="right-controls">
+        <button onclick="expandAll()">Expand All</button>
+        <button onclick="collapseAll()">Collapse All</button>
+        <button onclick="downloadFixSnippets()">Download Suggestions</button>
+        <button onclick="downloadAutoFixed()">Demo: Auto-Fixed</button>
+      </div>
+    </div>
+
+    {% if suggestions %}
+      {% for s in suggestions %}
+        <div class="suggestion-box reveal">
+          <div class="suggestion-header">
+            <strong>Line {{ s.line }}:</strong> {{ s.suggestion }}
+            <button class="toggle-code" title="Expand/collapse">▼</button>
+          </div>
+          <div class="suggestion-body">
+            <em>{{ s.explanation }}</em><br />
+            <strong>Impact:</strong> {{ s.impact_estimate }}
+            {% if s.fix_snippet %}
+              <pre><code class="language-python">{{ s.fix_snippet }}</code></pre>
+              <div class="button-row">
+                <button class="see-code" data-line="{{ s.line }}">See in Code</button>
+                <button class="copy-btn">Copy</button>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <h3>Efficiency Score by Structure Type:</h3>
+    <div class="chart-wrapper">
+      <canvas id="structureChart"></canvas>
+    </div>
+
+    <h3>Structure Usage Distribution:</h3>
+    <div class="chart-wrapper">
+      <canvas id="usageChart"></canvas>
+    </div>
+
+    <h3>Suggestion Category Breakdown:</h3>
+    <div class="chart-wrapper">
+      <canvas id="categoryChart"></canvas>
+    </div>
+
+    <script>
+      const structureChartData = {{ structure_chart_data | tojson | safe }};
+      const suggestionCategoryData = {{ suggestion_category_data | tojson | safe }};
+    </script>
+  {% endif %}
+</div>
+
+<!-- Load Ace Editor and custom script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
